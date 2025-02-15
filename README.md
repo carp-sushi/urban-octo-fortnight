@@ -2,25 +2,47 @@
 
 ## Notes
 
-1) Use ADTs instead of String for player type.
-2) Separate functionality (use pure functions) from IO, which makes it easier to test.
-3) Add a simulation function: runs a sequence of moves (again, for testing).
-4) The board could just be a `Data.Sequence`, which allows simple index based gets AND sets.
-   This makes the `makeMove` function simpler.
-5) Instead of requiring the user to enter 2d coordinates, they could just enter a position.
-   For example:
+The provided code is a solid solution, and given the scope of the project would probably be fine as
+is. However, here are some improvements and additions I think could be made.
+
+- Use ADT instead of String for player.
+- Use `Data.Array` or `Data.Sequence` instead of [] for the board. This allows simpler access and
+  modification.
+- Use `<>` instead of `++` for combination.
+- Add tests using something like tasty, hspec.
+- Add a simulation function: runs a game given a sequence of coordinates (again, for testing).
+
+## Alternative Design
+
+As an alternative to the current design, the board could be modeled as a sequence.
+Also, instead of requiring the user to enter coordinates, a simple positional layout could be used.
+Most people count from one, and this prevents mistakes where users would enter row/col coordinates
+in the wrong order.
+
+### Design Visual
 
 ```
-Pos     View    Model
-1 2 3   X O X
-4 5 6 = O X O = [X,O,X,O,X,O,X,-,-]
-7 8 9   X - -
+Positions    View     Model
+---------    -----    -------------------
+1 2 3        X O X
+4 5 6        O X O    [X,O,X,O,X,O,X,-,-]
+7 8 9        X - -
+---------    -----    -------------------
 ```
 
-Here, input positions would be [1, 2, 3, 6, 5, 4, 7] for simulation.
 Model index is a simple calculation of `position - 1`.
 
-## TODO
+In the example above, the input positions would be [1, 2, 3, 6, 5, 4, 7] for game simulation.
 
-- Print board as grid
-- Add tests
+For reference, see the prototype code on GitHub at
+https://github.com/carp-sushi/urban-octo-fortnight
+
+### Simulation Output
+
+```
+$ stack run
+X O X
+O X O
+X - -
+Winner = Player1
+```

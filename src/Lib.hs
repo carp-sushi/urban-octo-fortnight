@@ -1,12 +1,11 @@
 module Lib (
   Game,
   Board,
-  Position,
   Player (..),
   Move (..),
   initGame,
   makeMove,
-  hasWinner,
+  isWinningBoard,
   simulateGame,
   showBoard,
 ) where
@@ -16,17 +15,8 @@ import Data.Sequence as S
 -- Current player and board state
 type Game = (Player, Board)
 
--- Board is a matrix of moves represented as a flat sequence.
--- Board position is 1-based, so valid positions are [1..9]
---
--- 1 2 3     X X O
--- 4 5 6 <=> O O X <=> [X,X,O,O,O,X,X,O,X]
--- 7 8 9     X O X
---
+-- Board is a sequence of moves
 type Board = S.Seq Move
-
--- Board position is Int
-type Position = Int
 
 -- Two player turn based game
 data Player
@@ -47,39 +37,38 @@ instance Show Move where
   show X = "X"
   show O = "O"
 
--- Create an empty board with Player1 moving first.
+-- Represents the sequence length for 3x3 board.
+boardSize :: Int
+boardSize = 9
+
+-- Create a new 3x3 board with Player1 moving first.
 initGame :: Game
 initGame =
-  (Player1, S.replicate (3 * 3) Nil)
+  (Player1, S.replicate boardSize Nil)
 
--- Map players to move values
+-- Determine which player moves next.
+nextPlayer :: Player -> Player
+nextPlayer player =
+  if player == Player1 then Player2 else Player1
+
+-- Determine move for current player.
 moveFor :: Player -> Move
 moveFor player =
   if player == Player1 then X else O
 
--- Determine the player for the next turn.
-nextTurn :: Player -> Player
-nextTurn player =
-  if player == Player1 then Player2 else Player1
-
 -- Add a move to the board at a given position.
-makeMove :: Game -> Position -> Game
+makeMove :: Game -> Int -> Game
 makeMove (player, board) position =
   if isValidMove
-    then (nextTurn player, updatedBoard)
+    then (nextPlayer player, board')
     else (player, board)
   where
     idx = position - 1
     isValidMove = S.lookup idx board == Just Nil
-    updatedBoard = S.update idx (moveFor player) board
+    board' = S.update idx (moveFor player) board
 
--- A winning slice is 3 of the same moves in sequence
-isWinningSlice :: S.Seq Move -> Bool
-isWinningSlice slice =
-  S.length slice == 3 && (all (== X) slice || all (== O) slice)
-
--- A slice is a sub-sequence of moves
-getSlice :: Board -> [Position] -> S.Seq Move
+-- A slice is a sub-sequence of moves that could represent a win.
+getSlice :: Board -> [Int] -> S.Seq Move
 getSlice board idxs =
   S.fromList $
     map (S.index board) idxs
@@ -88,27 +77,32 @@ getSlice board idxs =
 -- Note that indexes are used here, not positions.
 getSlices :: Board -> S.Seq (S.Seq Move)
 getSlices board =
-  S.fromList $ map (getSlice board) indexTable
+  if S.length board == boardSize
+    then S.fromList $ map (getSlice board) indexTable
+    else S.empty
   where
     rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
     cols = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
     diag = [[0, 4, 8], [2, 4, 6]]
     indexTable = rows <> cols <> diag
 
--- Determine whether a player has won.
-hasWinner :: Board -> Bool
-hasWinner board =
+-- Determine whether a board contains a winning sequence of moves.
+isWinningBoard :: Board -> Bool
+isWinningBoard board =
   any isWinningSlice (getSlices board)
+  where
+    isWinningSlice slice =
+      S.length slice == 3 && (all (== X) slice || all (== O) slice)
 
 -- Simulate game play given a sequence of positions.
-simulateGame :: Game -> [Position] -> (Game, Bool)
+simulateGame :: Game -> [Int] -> (Game, Bool)
 simulateGame game [] = (game, False)
 simulateGame game@(player, _) (position : rest) =
-  if hasWinner updatedBoard
-    then ((player, updatedBoard), True)
-    else simulateGame (nextPlayer, updatedBoard) rest
+  if isWinningBoard board'
+    then ((player, board'), True)
+    else simulateGame (player', board') rest
   where
-    (nextPlayer, updatedBoard) = makeMove game position
+    (player', board') = makeMove game position
 
 -- Render board as string
 showBoard :: Board -> String
