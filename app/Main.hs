@@ -12,15 +12,14 @@ import Lib
 --
 -- player1: [1, 5, 9, 3, 7, 8, 4]
 -- player2: [5, 1, 7, 3, 8, 2]
--- draw:    [1, 3, 2, 4, 6, 5, 9, 8, 7]
+-- draw:    [5, 1, 6, 4, 7, 3, 2, 8, 9]
 --
 main :: IO ()
 main = do
-  let ((player, board), winner) = simulateGame defaultGame [1, 2, 3, 6, 5, 4, 7]
+  let ((player, board), winner) = simulateGame initGame [5, 1, 6, 4, 7, 3, 2, 8, 9]
   if winner then do
-    print board
-    putStr "Winner = "
-    print player
+    putStr $ showBoard board
+    putStrLn $ "Winner = " <> show player
   else do
-    print board
+    putStr $ showBoard board
     putStrLn "Draw"

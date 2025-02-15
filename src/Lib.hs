@@ -4,10 +4,11 @@ module Lib
     Position,
     Player(..),
     Move(..),
-    defaultGame,
+    initGame,
     makeMove,
     hasWinner,
     simulateGame,
+    showBoard,
   ) where
 
 import Data.Sequence as S
@@ -23,9 +24,6 @@ type Game = (Player, Board)
 -- 7 8 9     X O X
 --
 type Board = S.Seq Move
-
---instance Show Board where
---  show board = TODO
 
 -- Board position is Int
 type Position = Int
@@ -47,8 +45,8 @@ instance Show Move where
   show O   = "O"
 
 -- Create an empty board with Player1 moving first.
-defaultGame :: Game
-defaultGame =
+initGame :: Game
+initGame =
   (Player1, S.replicate (3 * 3) Nil)
 
 -- Map players to move values
@@ -108,3 +106,21 @@ simulateGame game@(player, _) (position : rest) =
     if hasWinner updatedBoard
       then ((player, updatedBoard), True)
       else simulateGame (nextPlayer, updatedBoard) rest
+
+-- Render board as string
+showBoard :: Board -> String
+showBoard board =
+    S.index rows 0 <>
+    S.index rows 1 <>
+    S.index rows 2
+  where
+    rows = fmap showRow (S.chunksOf 3 board)
+
+-- Render a board row as a string
+showRow :: S.Seq Move -> String
+showRow row =
+    showCol 0 <> " " <>
+    showCol 1 <> " " <>
+    showCol 2 <> "\n"
+  where
+    showCol i = show $ S.index row i
