@@ -1,15 +1,15 @@
-module Lib
-  ( Game,
-    Board,
-    Position,
-    Player(..),
-    Move(..),
-    initGame,
-    makeMove,
-    hasWinner,
-    simulateGame,
-    showBoard,
-  ) where
+module Lib (
+  Game,
+  Board,
+  Position,
+  Player (..),
+  Move (..),
+  initGame,
+  makeMove,
+  hasWinner,
+  simulateGame,
+  showBoard,
+) where
 
 import Data.Sequence as S
 
@@ -30,19 +30,22 @@ type Position = Int
 
 -- Two player turn based game
 data Player
-  = Player1 | Player2
+  = Player1
+  | Player2
   deriving (Eq, Ord, Show)
 
 -- A move by a player on a board.
 data Move
-  = Nil | X | O
-  deriving Eq
+  = Nil
+  | X
+  | O
+  deriving (Eq)
 
 -- Maps moves to strings
 instance Show Move where
   show Nil = "-"
-  show X   = "X"
-  show O   = "O"
+  show X = "X"
+  show O = "O"
 
 -- Create an empty board with Player1 moving first.
 initGame :: Game
@@ -82,16 +85,15 @@ getSlice board idxs =
     map (S.index board) idxs
 
 -- Get all slices from the board that could contain a winning sequence of moves.
--- Note that indexes are used here, not positions, because this is a private function.
+-- Note that indexes are used here, not positions.
 getSlices :: Board -> S.Seq (S.Seq Move)
 getSlices board =
-    S.fromList $ map (getSlice board) indexTable
+  S.fromList $ map (getSlice board) indexTable
   where
-    indexTable =
-      [ [0, 1, 2], [3, 4, 5], [6, 7, 8], -- rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], -- columns
-        [0, 4, 8], [2, 4, 6]             -- diagonals
-      ]
+    rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+    cols = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
+    diag = [[0, 4, 8], [2, 4, 6]]
+    indexTable = rows <> cols <> diag
 
 -- Determine whether a player has won.
 hasWinner :: Board -> Bool
@@ -102,25 +104,29 @@ hasWinner board =
 simulateGame :: Game -> [Position] -> (Game, Bool)
 simulateGame game [] = (game, False)
 simulateGame game@(player, _) (position : rest) =
-  let (nextPlayer, updatedBoard) = makeMove game position in
-    if hasWinner updatedBoard
-      then ((player, updatedBoard), True)
-      else simulateGame (nextPlayer, updatedBoard) rest
+  if hasWinner updatedBoard
+    then ((player, updatedBoard), True)
+    else simulateGame (nextPlayer, updatedBoard) rest
+  where
+    (nextPlayer, updatedBoard) = makeMove game position
 
 -- Render board as string
 showBoard :: Board -> String
 showBoard board =
-    S.index rows 0 <>
-    S.index rows 1 <>
-    S.index rows 2
+  S.index rows 0
+    <> S.index rows 1
+    <> S.index rows 2
   where
     rows = fmap showRow (S.chunksOf 3 board)
 
 -- Render a board row as a string
 showRow :: S.Seq Move -> String
 showRow row =
-    showCol 0 <> " " <>
-    showCol 1 <> " " <>
-    showCol 2 <> "\n"
+  showCol 0
+    <> " "
+    <> showCol 1
+    <> " "
+    <> showCol 2
+    <> "\n"
   where
     showCol i = show $ S.index row i
