@@ -107,20 +107,7 @@ simulateGame game@(player, _) (position : rest) =
 -- Render board as string
 showBoard :: Board -> String
 showBoard board =
-  S.index rows 0
-    <> S.index rows 1
-    <> S.index rows 2
+  foldl (\acc row -> acc <> row <> "\n") "" rows
   where
     rows = fmap showRow (S.chunksOf 3 board)
-
--- Render a board row as a string
-showRow :: S.Seq Move -> String
-showRow row =
-  showCol 0
-    <> " "
-    <> showCol 1
-    <> " "
-    <> showCol 2
-    <> "\n"
-  where
-    showCol i = show $ S.index row i
+    showRow row = foldl (\acc move -> acc <> show move <> " ") "" row
