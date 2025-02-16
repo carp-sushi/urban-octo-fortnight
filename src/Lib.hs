@@ -37,11 +37,15 @@ instance Show Move where
   show X = "X"
   show O = "O"
 
--- Represents the sequence length for 3x3 board.
-boardSize :: Int
-boardSize = 9
+-- Row size
+rowSize :: Int
+rowSize = 3
 
--- Create a new 3x3 board with Player1 moving first.
+-- Represents the sequence length for a board.
+boardSize :: Int
+boardSize = rowSize * rowSize
+
+-- Create a new board with Player1 moving first.
 initGame :: Game
 initGame =
   (Player1, S.replicate boardSize Nil)
@@ -92,7 +96,7 @@ isWinningBoard board =
   any isWinningSlice (getSlices board)
   where
     isWinningSlice slice =
-      S.length slice == 3 && (all (== X) slice || all (== O) slice)
+      S.length slice == rowSize && (all (== X) slice || all (== O) slice)
 
 -- Simulate game play given a sequence of positions.
 simulateGame :: Game -> [Int] -> (Game, Bool)
@@ -109,5 +113,5 @@ showBoard :: Board -> String
 showBoard board =
   foldl (\acc row -> acc <> row <> "\n") mempty rows
   where
-    rows = fmap showRow (S.chunksOf 3 board)
+    rows = fmap showRow (S.chunksOf rowSize board)
     showRow = foldl (\acc move -> acc <> show move <> " ") mempty
