@@ -3,6 +3,7 @@ module Lib (
   Board,
   Player (..),
   Move (..),
+  SimStatus (..),
   initGame,
   makeMove,
   isWinningBoard,
@@ -98,12 +99,18 @@ isWinningBoard board =
     isWinningSlice slice =
       S.length slice == rowSize && (all (== X) slice || all (== O) slice)
 
+-- Use a status for simulation
+data SimStatus
+  = Win
+  | Draw
+  deriving (Eq, Ord, Show)
+
 -- Simulate game play given a sequence of positions.
-simulateGame :: Game -> [Int] -> (Game, Bool)
-simulateGame game [] = (game, False)
+simulateGame :: Game -> [Int] -> (Game, SimStatus)
+simulateGame game [] = (game, Draw)
 simulateGame game@(player, _) (position : rest) =
   if isWinningBoard board'
-    then ((player, board'), True)
+    then ((player, board'), Win)
     else simulateGame (player', board') rest
   where
     (player', board') = makeMove game position

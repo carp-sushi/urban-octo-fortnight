@@ -15,11 +15,11 @@ import Lib
 --
 main :: IO ()
 main = do
-  let ((player, board), winner) = simulateGame initGame [1, 2, 3, 6, 5, 4, 7]
-  if winner
+  let ((player, board), status) = simulateGame initGame [1, 2, 3, 6, 5, 4, 7]
+  if status == Win
     then do
       putStr $ showBoard board
       putStrLn $ "Winner = " <> show player
     else do
       putStr $ showBoard board
-      putStrLn "Draw"
+      putStrLn "No winner"

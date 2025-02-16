@@ -7,8 +7,8 @@ import Test.Tasty.Hspec
 import qualified Data.Sequence as S
 
 -- Tests game init operation
-spec_init_ops :: Spec
-spec_init_ops =
+spec_init :: Spec
+spec_init =
   describe "initGame" $ do
     let (player, board) = initGame
     it "initial board should have the proper size" $ do
@@ -19,8 +19,8 @@ spec_init_ops =
       player `shouldBe` Player1
 
 -- Tests game movement operation
-spec_move_ops :: Spec
-spec_move_ops =
+spec_move :: Spec
+spec_move =
   describe "makeMove" $ do
     let game = initGame
     it "should place a move in the middle of the board" $ do
@@ -29,8 +29,8 @@ spec_move_ops =
       makeMove game 99 `shouldBe` game
 
 -- Tests winner detection operation
-spec_winner_ops :: Spec
-spec_winner_ops =
+spec_winner :: Spec
+spec_winner =
   describe "isWinningBoard" $ do
     let (_, board) = initGame
     it "should detect a valid winner" $ do
@@ -41,32 +41,32 @@ spec_winner_ops =
       isWinningBoard (S.fromList [X, X, X]) `shouldBe` False
 
 -- Tests game simulation operation
-spec_simulation_ops :: Spec
-spec_simulation_ops =
+spec_simulation :: Spec
+spec_simulation =
   describe "simulateGame" $ do
     let game = initGame
     it "should simulate a player 1 win" $ do
-      let ((player, board), isWinner) = simulateGame game [1, 2, 3, 6, 5, 4, 7]
+      let ((player, board), status) = simulateGame game [1, 2, 3, 6, 5, 4, 7]
+      status `shouldBe` Win
       player `shouldBe` Player1
       board `shouldBe` S.fromList [X, O, X, O, X, O, X, Nil, Nil]
-      isWinner `shouldBe` True
     it "should simulate a player 2 win" $ do
-      let ((player, board), isWinner) = simulateGame game [5, 1, 7, 3, 8, 2]
+      let ((player, board), status) = simulateGame game [5, 1, 7, 3, 8, 2]
+      status `shouldBe` Win
       player `shouldBe` Player2
       board `shouldBe` S.fromList [O, O, O, Nil, X, Nil, X, X, Nil]
-      isWinner `shouldBe` True
     it "should simulate a draw" $ do
-      let ((_, board), isWinner) = simulateGame game [5, 1, 6, 4, 7, 3, 2, 8, 9]
+      let ((_, board), status) = simulateGame game [5, 1, 6, 4, 7, 3, 2, 8, 9]
+      status `shouldBe` Draw
       board `shouldBe` S.fromList [O, X, O, O, X, X, X, O, X]
-      isWinner `shouldBe` False
 
 -- Collect all specs
 allSpecs :: [Spec]
 allSpecs =
-  [ spec_init_ops
-  , spec_move_ops
-  , spec_winner_ops
-  , spec_simulation_ops
+  [ spec_init
+  , spec_move
+  , spec_winner
+  , spec_simulation
   ]
 
 -- Run tests
