@@ -110,4 +110,4 @@ showBoard board =
   foldl (\acc row -> acc <> row <> "\n") "" rows
   where
     rows = fmap showRow (S.chunksOf 3 board)
-    showRow row = foldl (\acc move -> acc <> show move <> " ") "" row
+    showRow = foldl (\acc move -> acc <> show move <> " ") ""
