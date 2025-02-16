@@ -1,6 +1,6 @@
 .PHONY: all format build test lint run clean
 
-all: format build run
+all: format build test
 
 format:
 	@fourmolu -q -i src/*.hs app/*.hs test/*.hs
