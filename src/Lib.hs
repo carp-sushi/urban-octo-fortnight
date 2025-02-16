@@ -107,7 +107,7 @@ simulateGame game@(player, _) (position : rest) =
 -- Render board as string
 showBoard :: Board -> String
 showBoard board =
-  foldl (\acc row -> acc <> row <> "\n") "" rows
+  foldl (\acc row -> acc <> row <> "\n") mempty rows
   where
     rows = fmap showRow (S.chunksOf 3 board)
-    showRow = foldl (\acc move -> acc <> show move <> " ") ""
+    showRow = foldl (\acc move -> acc <> show move <> " ") mempty
