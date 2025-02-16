@@ -4,7 +4,7 @@ import Test.Hspec
 import Test.Tasty
 import Test.Tasty.Hspec
 
-import Data.Sequence as S
+import qualified Data.Sequence as S
 
 -- Tests game init operation
 spec_init_ops :: Spec

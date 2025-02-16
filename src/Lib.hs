@@ -10,7 +10,7 @@ module Lib (
   showBoard,
 ) where
 
-import Data.Sequence as S
+import qualified Data.Sequence as S
 
 -- Current player and board state
 type Game = (Player, Board)
