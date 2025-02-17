@@ -103,15 +103,26 @@ isWinningBoard board =
 data SimStatus
   = Win
   | Draw
+  | Error String
   deriving (Eq, Ord, Show)
 
 -- Simulate game play given a sequence of positions.
 simulateGame :: Game -> [Int] -> (Game, SimStatus)
-simulateGame game [] = (game, Draw)
-simulateGame game@(player, _) (position : rest) =
+simulateGame game positions =
+  if length positions <= boardSize
+    then simulateGame' game positions
+    else
+      ( game
+      , Error "game simulation only supports up to 9 moves"
+      )
+
+-- Simulate game play logic.
+simulateGame' :: Game -> [Int] -> (Game, SimStatus)
+simulateGame' game [] = (game, Draw)
+simulateGame' game@(player, _) (position : rest) =
   if isWinningBoard board'
     then ((player, board'), Win)
-    else simulateGame (player', board') rest
+    else simulateGame' (player', board') rest
   where
     (player', board') = makeMove game position
 
