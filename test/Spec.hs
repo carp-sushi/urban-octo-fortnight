@@ -11,11 +11,11 @@ spec_init :: Spec
 spec_init =
   describe "initGame" $ do
     let (player, board) = initGame
-    it "initial board should have the proper size" $ do
+    it "should return a board with the proper size" $ do
       S.length board `shouldBe` 9
-    it "initial board should contain no moves" $ do
+    it "should return a board that contains no moves" $ do
       all (== Nil) board `shouldBe` True
-    it "player one should go first" $ do
+    it "should choose Player1 to move first" $ do
       player `shouldBe` Player1
 
 -- Tests game movement operation
@@ -25,19 +25,19 @@ spec_move =
     let game = initGame
     it "should place a move in the middle of the board" $ do
       makeMove game 5 `shouldBe` (Player2, S.fromList [Nil, Nil, Nil, Nil, X, Nil, Nil, Nil, Nil])
-    it "move with invalid position should make no changes" $ do
+    it "should make no changes when passed an invalid position" $ do
       makeMove game 99 `shouldBe` game
 
 -- Tests winner detection operation
 spec_winner :: Spec
 spec_winner =
   describe "isWinningBoard" $ do
-    let (_, board) = initGame
-    it "should detect a valid winner" $ do
+    it "should detect a winner" $ do
       isWinningBoard (S.fromList [X, O, X, O, X, O, X, Nil, Nil]) `shouldBe` True
-    it "initial board shouldn't contain a winner" $ do
+    it "should NOT detect a winner on the initial board" $ do
+      let (_, board) = initGame
       isWinningBoard board `shouldBe` False
-    it "invalid board shouldn't contain a winner" $ do
+    it "should NOT detect a winner on an invalid board" $ do
       isWinningBoard (S.fromList [X, X, X]) `shouldBe` False
 
 -- Tests game simulation operation
@@ -73,4 +73,4 @@ allSpecs =
 main :: IO ()
 main = do
   specs <- concat <$> mapM testSpecs allSpecs
-  defaultMain (testGroup "Game specs" specs)
+  defaultMain (testGroup "tic-tac-toe specs" specs)
