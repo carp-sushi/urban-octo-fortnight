@@ -9,7 +9,6 @@ module Lib (
   isWinningBoard,
   simulateGame,
   showBoard,
-  outOfMoves,
 ) where
 
 import qualified Data.Sequence as S
@@ -117,7 +116,7 @@ simulateGame game positions =
 
 -- Simulate game play logic.
 simulateGame' :: Game -> [Int] -> (Game, SimStatus)
-simulateGame' game@(_, board) [] = (game, if outOfMoves board then Draw else Incomplete)
+simulateGame' game@(_, board) [] = (game, if Nil `notElem` board then Draw else Incomplete)
 simulateGame' game@(player, _) (position : rest) =
   if isWinningBoard board'
     then ((player, board'), Win)
@@ -132,8 +131,3 @@ showBoard board =
   where
     rows = fmap showRow (S.chunksOf rowSize board)
     showRow = foldl (\acc move -> acc <> show move <> " ") mempty
-
--- Determine whether a board has any moves left
-outOfMoves :: Board -> Bool
-outOfMoves board =
-  all (/= Nil) board

@@ -17,19 +17,21 @@ import Lib
 -- Interactive game play on the command line.
 playGame :: Game -> IO ()
 playGame game@(player, board) = do
-    putStr $ showBoard board
-    putStrLn $ "Enter move[1-9] for " <> show player <> ":"
-    line <- getLine
-    let position = read line :: Int
-    let (player', board') = makeMove game position
-    if isWinningBoard board' then do
+  putStrLn $ showBoard board <> "Enter move[1-9] for " <> show player <> ":"
+  line <- getLine
+  let position = read line :: Int
+  let (player', board') = makeMove game position
+  if isWinningBoard board'
+    then do
       putStr $ showBoard board'
       putStrLn $ "Winner = " <> show player
-    else if outOfMoves board' then do
-      putStr $ showBoard board'
-      putStrLn "Draw"
-    else do
-      playGame (player', board')
+    else
+      if Nil `notElem` board'
+        then do
+          putStr $ showBoard board'
+          putStrLn "Draw"
+        else do
+          playGame (player', board')
 
 main :: IO ()
 main = do
