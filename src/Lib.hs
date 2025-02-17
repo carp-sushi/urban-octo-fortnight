@@ -103,6 +103,7 @@ isWinningBoard board =
 data SimStatus
   = Win
   | Draw
+  | Incomplete
   | Error String
   deriving (Eq, Ord, Show)
 
@@ -111,14 +112,11 @@ simulateGame :: Game -> [Int] -> (Game, SimStatus)
 simulateGame game positions =
   if length positions <= boardSize
     then simulateGame' game positions
-    else
-      ( game
-      , Error "game simulation only supports up to 9 moves"
-      )
+    else (game, Error "game simulation only supports up to 9 moves")
 
 -- Simulate game play logic.
 simulateGame' :: Game -> [Int] -> (Game, SimStatus)
-simulateGame' game [] = (game, Draw)
+simulateGame' game@(_, board) [] = (game, if all (/= Nil) board then Draw else Incomplete)
 simulateGame' game@(player, _) (position : rest) =
   if isWinningBoard board'
     then ((player, board'), Win)
