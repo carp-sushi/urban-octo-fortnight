@@ -35,9 +35,6 @@ Model index is a simple calculation of `position - 1`.
 
 In the example above, the input positions would be [1, 2, 3, 6, 5, 4, 7] for game simulation.
 
-For reference, see the prototype code on GitHub at
-https://github.com/carp-sushi/urban-octo-fortnight
-
 ### Simulation Output
 
 ```
