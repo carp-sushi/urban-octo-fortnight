@@ -118,11 +118,10 @@ simulateGame game positions =
 simulateGame' :: Game -> [Int] -> (Game, SimStatus)
 simulateGame' game@(_, board) [] = (game, if Nil `notElem` board then Draw else Incomplete)
 simulateGame' game@(player, _) (position : rest) =
-  if isWinningBoard board'
-    then ((player, board'), Win)
-    else simulateGame' (player', board') rest
-  where
-    (player', board') = makeMove game position
+  let (player', board') = makeMove game position
+   in if isWinningBoard board'
+        then ((player, board'), Win)
+        else simulateGame' (player', board') rest
 
 -- Render board as string
 showBoard :: Board -> String

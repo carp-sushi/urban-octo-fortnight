@@ -23,19 +23,16 @@ playGame game@(player, board) = do
   let (player', board') = makeMove game position
   if isWinningBoard board'
     then do
-      putStr $ showBoard board'
-      putStrLn $ "Winner = " <> show player
+      putStrLn $ showBoard board' <> "Winner = " <> show player
     else
       if Nil `notElem` board'
         then do
-          putStr $ showBoard board'
-          putStrLn "Draw"
+          putStrLn $ showBoard board' <> "Draw"
         else do
           playGame (player', board')
 
 main :: IO ()
 main = do
-  putStrLn "Grid Positions"
-  putStrLn "1 2 3\n4 5 6\n7 8 9\n"
+  putStrLn "Board positions\n1 2 3\n4 5 6\n7 8 9\n"
   putStrLn "Starting game..."
   playGame initGame

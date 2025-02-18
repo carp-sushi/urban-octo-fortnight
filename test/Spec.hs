@@ -47,13 +47,11 @@ spec_simulation =
     let game = initGame
     it "should simulate a player 1 win" $ do
       let ((player, board), status) = simulateGame game [1, 2, 3, 6, 5, 4, 7]
-      status `shouldBe` Win
-      player `shouldBe` Player1
+      (player, status) `shouldBe` (Player1, Win)
       board `shouldBe` S.fromList [X, O, X, O, X, O, X, Nil, Nil]
     it "should simulate a player 2 win" $ do
       let ((player, board), status) = simulateGame game [5, 1, 7, 3, 8, 2]
-      status `shouldBe` Win
-      player `shouldBe` Player2
+      (player, status) `shouldBe` (Player2, Win)
       board `shouldBe` S.fromList [O, O, O, Nil, X, Nil, X, X, Nil]
     it "should simulate a draw" $ do
       let ((_, board), status) = simulateGame game [5, 1, 6, 4, 7, 3, 2, 8, 9]
