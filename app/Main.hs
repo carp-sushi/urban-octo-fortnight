@@ -31,6 +31,23 @@ playGame game@(player, board) = do
         else do
           playGame (player', board')
 
+-- Run the game play simulation
+runSimulation :: IO ()
+runSimulation = do
+  let ((player, board), status) = simulateGame initGame [1, 2, 3, 6, 5, 4, 7]
+  case status of
+    Win -> do
+      putStr $ showBoard board
+      putStrLn $ "Winner = " <> show player
+    Draw -> do
+      putStr $ showBoard board
+      putStrLn "Draw"
+    Incomplete -> do
+      putStr $ showBoard board
+      putStrLn "Game incomplete"
+    Error message ->
+      putStrLn $ "Error: " <> message
+
 main :: IO ()
 main = do
   putStrLn "Board positions\n1 2 3\n4 5 6\n7 8 9\n"

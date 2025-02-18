@@ -41,7 +41,10 @@ https://github.com/carp-sushi/urban-octo-fortnight
 ### Simulation Output
 
 ```
-$ stack run
+$ stack repl
+...
+
+λ runSimulation
 X O X
 O X O
 X - -
