@@ -9,6 +9,7 @@ is. However, here are some improvements and additions I think could be made.
 - Use `Data.Array` or `Data.Sequence` instead of [] for the board. This allows simpler access and
   modification.
 - Use `<>` instead of `++` for combination.
+- Add exit condition for draws.
 - Add tests using something like tasty, hspec.
 - Add a simulation function: runs a game given a sequence of coordinates (again, for testing).
 
