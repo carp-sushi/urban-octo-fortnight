@@ -3,6 +3,7 @@ module Lib (
   Board,
   Player (..),
   Move (..),
+  Error (..),
   SimStatus (..),
   initGame,
   makeMove,
@@ -99,20 +100,23 @@ isWinningBoard board =
     isWinningSlice slice =
       S.length slice == rowSize && (all (== X) slice || all (== O) slice)
 
+-- A type for errors
+newtype Error = Error String
+  deriving (Eq, Show)
+
 -- Use a status for simulation
 data SimStatus
   = Win
   | Draw
   | Incomplete
-  | Error String
   deriving (Eq, Ord, Show)
 
 -- Simulate game play given a sequence of positions.
-simulateGame :: Game -> [Int] -> (Game, SimStatus)
+simulateGame :: Game -> [Int] -> Either Error (Game, SimStatus)
 simulateGame game positions =
   if length positions <= boardSize
-    then simulateGame' game positions
-    else (game, Error "game simulation only supports up to 9 moves")
+    then Right (simulateGame' game positions)
+    else Left (Error "game simulation only supports up to 9 moves")
 
 -- Simulate game play logic.
 simulateGame' :: Game -> [Int] -> (Game, SimStatus)

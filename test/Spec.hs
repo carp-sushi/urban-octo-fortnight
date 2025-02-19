@@ -46,17 +46,17 @@ spec_simulation =
   describe "simulateGame" $ do
     let game = initGame
     it "should simulate a player 1 win" $ do
-      let ((player, board), status) = simulateGame game [1, 2, 3, 6, 5, 4, 7]
-      (player, status) `shouldBe` (Player1, Win)
-      board `shouldBe` S.fromList [X, O, X, O, X, O, X, Nil, Nil]
+      let expected = Right ((Player1, S.fromList [X, O, X, O, X, O, X, Nil, Nil]), Win)
+      simulateGame game [1, 2, 3, 6, 5, 4, 7] `shouldBe` expected
     it "should simulate a player 2 win" $ do
-      let ((player, board), status) = simulateGame game [5, 1, 7, 3, 8, 2]
-      (player, status) `shouldBe` (Player2, Win)
-      board `shouldBe` S.fromList [O, O, O, Nil, X, Nil, X, X, Nil]
+      let expected = Right ((Player2, S.fromList [O, O, O, Nil, X, Nil, X, X, Nil]), Win)
+      simulateGame game [5, 1, 7, 3, 8, 2] `shouldBe` expected
     it "should simulate a draw" $ do
-      let ((_, board), status) = simulateGame game [5, 1, 6, 4, 7, 3, 2, 8, 9]
-      status `shouldBe` Draw
-      board `shouldBe` S.fromList [O, X, O, O, X, X, X, O, X]
+      let expected = Right ((Player2, S.fromList [O, X, O, O, X, X, X, O, X]), Draw)
+      simulateGame game [5, 1, 6, 4, 7, 3, 2, 8, 9] `shouldBe` expected
+    it "should return an error with > 9 moves" $ do
+      let expected = Left $ Error "game simulation only supports up to 9 moves"
+      simulateGame game [1 .. 12] `shouldBe` expected
 
 -- Collect all specs
 allSpecs :: [Spec]

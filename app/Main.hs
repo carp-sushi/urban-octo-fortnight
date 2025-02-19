@@ -22,8 +22,7 @@ playGame game@(player, board) = do
   let position = read line :: Int
   let (player', board') = makeMove game position
   if isWinningBoard board'
-    then do
-      putStrLn $ showBoard board' <> "Winner = " <> show player
+    then do putStrLn $ showBoard board' <> "Winner = " <> show player
     else
       if Nil `notElem` board'
         then do
@@ -34,19 +33,19 @@ playGame game@(player, board) = do
 -- Run the game play simulation
 runSimulation :: IO ()
 runSimulation = do
-  let ((player, board), status) = simulateGame initGame [1, 2, 3, 6, 5, 4, 7]
-  case status of
-    Win -> do
-      putStr $ showBoard board
-      putStrLn $ "Winner = " <> show player
-    Draw -> do
-      putStr $ showBoard board
-      putStrLn "Draw"
-    Incomplete -> do
-      putStr $ showBoard board
-      putStrLn "Game incomplete"
-    Error message ->
-      putStrLn $ "Error: " <> message
+  case simulateGame initGame [1, 2, 3, 6, 5, 4, 7] of
+    Left (Error message) -> putStrLn message
+    Right ((player, board), status) ->
+      case status of
+        Win -> do
+          putStr $ showBoard board
+          putStrLn $ "Winner = " <> show player
+        Draw -> do
+          putStr $ showBoard board
+          putStrLn "Draw"
+        Incomplete -> do
+          putStr $ showBoard board
+          putStrLn "Game incomplete"
 
 main :: IO ()
 main = do
