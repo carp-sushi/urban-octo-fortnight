@@ -87,8 +87,8 @@ indexTable =
 getSlices :: Board -> [[Move]]
 getSlices board =
   if S.length board == boardSize
-    then [getSlice idxs | idxs <- indexTable]
-    else []
+    then fmap getSlice indexTable
+    else mempty
   where
     getSlice = fmap (S.index board)
 
