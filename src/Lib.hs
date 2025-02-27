@@ -3,12 +3,14 @@ module Lib (
   Board,
   Player (..),
   Move (..),
+  Error (..),
   SimStatus (..),
   initGame,
   makeMove,
   isWinningBoard,
   simulateGame,
   showBoard,
+  outOfMoves,
 ) where
 
 import qualified Data.Sequence as S
@@ -72,24 +74,23 @@ makeMove (player, board) position =
     isValidMove = S.lookup idx board == Just Nil
     board' = S.update idx (moveFor player) board
 
--- A slice is a sub-sequence of moves that could represent a win.
-getSlice :: Board -> [Int] -> S.Seq Move
-getSlice board idxs =
-  S.fromList $
-    map (S.index board) idxs
-
--- Get all slices from the board that could contain a winning sequence of moves.
--- Note that indexes are used here, not positions.
-getSlices :: Board -> S.Seq (S.Seq Move)
-getSlices board =
-  if S.length board == boardSize
-    then S.fromList $ map (getSlice board) indexTable
-    else S.empty
+-- Pre-computed indexes for board slices.
+indexTable :: [[Int]]
+indexTable =
+  rows <> cols <> diag
   where
     rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
     cols = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
     diag = [[0, 4, 8], [2, 4, 6]]
-    indexTable = rows <> cols <> diag
+
+-- Get all slices from the board that could contain a winning sequence of moves.
+getSlices :: Board -> [[Move]]
+getSlices board =
+  if S.length board == boardSize
+    then [getSlice idxs | idxs <- indexTable]
+    else []
+  where
+    getSlice = fmap (S.index board)
 
 -- Determine whether a board contains a winning sequence of moves.
 isWinningBoard :: Board -> Bool
@@ -97,32 +98,45 @@ isWinningBoard board =
   any isWinningSlice (getSlices board)
   where
     isWinningSlice slice =
-      S.length slice == rowSize && (all (== X) slice || all (== O) slice)
+      length slice == rowSize && (all (== X) slice || all (== O) slice)
+
+-- A type for errors
+newtype Error = Error String
+  deriving (Eq, Show)
 
 -- Use a status for simulation
 data SimStatus
   = Win
   | Draw
   | Incomplete
-  | Error String
   deriving (Eq, Ord, Show)
 
 -- Simulate game play given a sequence of positions.
-simulateGame :: Game -> [Int] -> (Game, SimStatus)
-simulateGame game positions =
-  if length positions <= boardSize
-    then simulateGame' game positions
-    else (game, Error "game simulation only supports up to 9 moves")
-
--- Simulate game play logic.
-simulateGame' :: Game -> [Int] -> (Game, SimStatus)
-simulateGame' game@(_, board) [] = (game, if Nil `notElem` board then Draw else Incomplete)
-simulateGame' game@(player, _) (position : rest) =
-  if isWinningBoard board'
-    then ((player, board'), Win)
-    else simulateGame' (player', board') rest
+simulateGame :: Game -> [Int] -> Either Error (Game, SimStatus)
+simulateGame game moves =
+  if length moves <= boardSize
+    then Right $ loop game moves
+    else Left $ Error $ "simulation only supports a max of " <> show boardSize <> " moves"
   where
-    (player', board') = makeMove game position
+    loop g@(_, b) [] = (g, simStatus b)
+    loop g@(p, _) (h : t) =
+      if isWinningBoard b'
+        then ((p, b'), Win)
+        else loop (p', b') t
+      where
+        (p', b') = makeMove g h
+
+-- Determine whether a board has no moves left.
+outOfMoves :: Board -> Bool
+outOfMoves = notElem Nil
+
+-- Determine simulation status for a board
+simStatus :: Board -> SimStatus
+simStatus board =
+  case (isWinningBoard board, outOfMoves board) of
+    (False, False) -> Incomplete
+    (False, True) -> Draw
+    (True, _) -> Win
 
 -- Render board as string
 showBoard :: Board -> String

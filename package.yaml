@@ -5,18 +5,13 @@ license: BSD-3-Clause
 author: "carp-sushi"
 maintainer: "105142707+carp-sushi@users.noreply.github.com"
 copyright: "Copyright 2025-present, the original author(s)"
+description: Please see the README on GitHub at <https://github.com/carp-sushi/tic-tac-toe#readme>
 
 extra-source-files:
   - README.md
 
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description: Please see the README on GitHub at <https://github.com/carp-sushi/tic-tac-toe#readme>
-
 dependencies:
   - base >= 4.7 && < 5
-  - containers == 0.6.8
 
 ghc-options:
   - -Wall
@@ -31,6 +26,8 @@ ghc-options:
 
 library:
   source-dirs: src
+  dependencies:
+    - containers
 
 executables:
   tic-tac-toe-exe:
@@ -53,6 +50,7 @@ tests:
       - -with-rtsopts=-N
     dependencies:
       - tic-tac-toe
+      - containers
       - hspec
       - tasty
       - tasty-hspec

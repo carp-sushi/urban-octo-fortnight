@@ -13,29 +13,35 @@ import Lib
 --   player2 win: [5, 1, 7, 3, 8, 2]
 --   draw:        [5, 1, 6, 4, 7, 3, 2, 8, 9]
 --
+main :: IO ()
+main = do
+  putStrLn "Board positions\n1 2 3\n4 5 6\n7 8 9\n"
+  putStrLn "Starting game..."
+  playGame initGame
 
 -- Interactive game play on the command line.
 playGame :: Game -> IO ()
 playGame game@(player, board) = do
   putStrLn $ showBoard board <> "Enter move[1-9] for " <> show player <> ":"
   line <- getLine
-  let position = read line :: Int
+  let position = read line
   let (player', board') = makeMove game position
-  if isWinningBoard board'
-    then do
-      putStr $ showBoard board'
-      putStrLn $ "Winner = " <> show player
-    else
-      if Nil `notElem` board'
-        then do
-          putStr $ showBoard board'
-          putStrLn "Draw"
-        else do
-          playGame (player', board')
+  case (isWinningBoard board', outOfMoves board') of
+    (False, False) -> playGame (player', board')
+    (False, True) -> putStrLn $ showBoard board' <> "Draw"
+    (True, _) -> putStrLn $ showBoard board' <> "Winner = " <> show player
 
-main :: IO ()
-main = do
-  putStrLn "Grid Positions"
-  putStrLn "1 2 3\n4 5 6\n7 8 9\n"
-  putStrLn "Starting game..."
-  playGame initGame
+-- Run the game play simulation using a sequence of moves.
+runSimulation :: [Int] -> IO ()
+runSimulation positions = do
+  case simulateGame initGame positions of
+    Left (Error message) ->
+      putStrLn message
+    Right ((player, board), status) ->
+      putStr (showBoard board) >> printResult status player
+
+-- Print simulation result from output status
+printResult :: SimStatus -> Player -> IO ()
+printResult Win player = putStrLn $ "Winner = " <> show player
+printResult Draw _ = putStrLn "Draw"
+printResult Incomplete _ = putStrLn "Incomplete"
